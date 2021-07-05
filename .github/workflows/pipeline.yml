@@ -36,4 +36,5 @@ jobs:
           heroku_email: "nicholas.cruickshank25@gmail.com"
           healthcheck: "https://part11-pokedex-app.herokuapp.com/health"
           checkstring: "ok"
+          rollbackonhealthcheckfailed: true
         
