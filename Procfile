@@ -1,1 +1,1 @@
-web: broken deployment
+web: npm run start-prod
