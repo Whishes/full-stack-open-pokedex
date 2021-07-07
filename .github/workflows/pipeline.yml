@@ -34,7 +34,7 @@ jobs:
           start: npm run start-prod
           wait-on: http://localhost:5000
       - name: deploy to heroku
-        if: ${{ !contains(github.event.commits.*.message, "#skip") }}
+        if: ${{ !contains(github.event.commits.*.message, '#skip') }}
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
@@ -46,7 +46,7 @@ jobs:
   bump_version_number: 
     name: Bump Version Number
     needs: simple_deployment_pipeline
-    if: ${{ github.event_name == 'push' && !contains(github.event.commits.*.message, "#skip") }}
+    if: ${{ github.event_name == 'push' && !contains(github.event.commits.*.message, '#skip') }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
