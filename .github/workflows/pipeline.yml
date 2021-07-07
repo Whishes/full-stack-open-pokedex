@@ -43,7 +43,7 @@ jobs:
           healthcheck: "https://part11-pokedex-app.herokuapp.com/health"
           checkstring: "ok"
           rollbackonhealthcheckfailed: true
-  bump_version_number: 
+  bump_version: 
     name: Bump Version Number
     needs: simple_deployment_pipeline
     if: ${{ github.event_name == 'push' && !contains(github.event.commits.*.message, '#skip') }}
