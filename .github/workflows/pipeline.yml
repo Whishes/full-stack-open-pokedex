@@ -60,7 +60,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           MATRIX_CONTEXT: ${{ toJson(matrix) }}
         with: 
-          job_name: Success Slack Message
+          job_name: simple_deployment_pipeline
           status: custom
           fields: commit, author, took
           custom_payload: |
@@ -77,7 +77,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           MATRIX_CONTEXT: ${{ toJson(matrix) }}
         with:
-          job_name: Error Slack Message
+          job_name: simple_deployment_pipeline
           status: ${{ job.status }}
           fields: repo, message, commit, author, took
 
