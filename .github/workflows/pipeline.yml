@@ -62,6 +62,8 @@ jobs:
     needs: [simple_deployment_pipeline, bump_version]
     if: "github.event_name == 'push' && !contains(toJSON(github.event.commits.*.message), '#skip')"
     runs-on: ubuntu-latest
+    env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
       - name: Success Message
         if: ${{ success() }}
@@ -70,18 +72,15 @@ jobs:
           status: custom
           fields: commit, author, took
           custom_payload: |
-          {
-            username: 'github_action',
-            attachments: [{
-              color: 'good',
-              text: `A new version deployed to https://part11-pokedex-app.herokuapp.com/ (${process.env.AS_COMMIT}) by (${process.env.AS_AUTHOR}) build took (${process.env.AS_TOOK})`
-            }]
-          }
+            {
+              attachments: [{
+                color: 'good',
+                text: `A new version deployed to https://part11-pokedex-app.herokuapp.com/ ${process.env.AS_COMMIT} by ${process.env.AS_AUTHOR} build took ${process.env.AS_TOOK}`,
+              }]
+            }
       - name: Error Message
         uses: 8398a7/action-slack@v3
         if: ${{ failure() }}
         with:
           status: ${{ job.status }}
           fields: repo, message, commit, author, took
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
