@@ -43,31 +43,19 @@ jobs:
           healthcheck: "https://part11-pokedex-app.herokuapp.com/health"
           checkstring: "ok"
           rollbackonhealthcheckfailed: true
-  bump_version: 
-    name: Bump Version Number
-    needs: simple_deployment_pipeline
-    if: "github.event_name == 'push' && !contains(toJSON(github.event.commits.*.message), '#skip')"
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: '0'
-    - name: Bump version and push tag
-      uses: anothrNick/github-tag-action@1.33.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        DEFAULT_BUMP: patch
-  slack_notification:
-    name: Alert on Slack
-    needs: [simple_deployment_pipeline, bump_version]
-    if: "github.event_name == 'push' && !contains(toJSON(github.event.commits.*.message), '#skip')"
-    runs-on: ubuntu-latest
-    env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-    steps:
-      - name: Success Message
-        if: ${{ success() }}
+      - name: Bump Version and Push Tag
+        if: "github.event_name == 'push' && !contains(toJSON(github.event.commits.*.message), '#skip')"
+        with:
+          fetch-depth: '0'
+        uses: anothrNick/github-tag-action@1.33.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch
+      - name: Success Slack Message
+        if: ${{ github.event_name == 'push' && !contains(toJSON(github.event.commits.*.message), '#skip') && success() }}
         uses: 8398a7/action-slack@v3
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with: 
           status: custom
           fields: commit, author, took
@@ -75,12 +63,15 @@ jobs:
             {
               attachments: [{
                 color: 'good',
-                text: `A new version deployed to https://part11-pokedex-app.herokuapp.com/ ${process.env.AS_COMMIT} by ${process.env.AS_AUTHOR} build took ${process.env.AS_TOOK}`,
+                text: `A new version deployed to https://part11-pokedex-app.herokuapp.com/ (${process.env.AS_COMMIT}) by ${process.env.AS_AUTHOR} build took ${process.env.AS_TOOK}`,
               }]
             }
-      - name: Error Message
+      - name: Error Slack Message
+        if: ${{ github.event_name == 'push' && !contains(toJSON(github.event.commits.*.message), '#skip') && failure() }}
         uses: 8398a7/action-slack@v3
-        if: ${{ failure() }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
           status: ${{ job.status }}
           fields: repo, message, commit, author, took
+
